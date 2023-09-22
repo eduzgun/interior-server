@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+python-dotenv = "*"
+flask-cors = "*"
+flask-sqlalchemy = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
+
+[scripts]
+dev = "flask run -h 0.0.0.0" # <- for docker
+# dev = "flask run"
+seed = "python seed.py"
+start = "gunicorn app:app"
