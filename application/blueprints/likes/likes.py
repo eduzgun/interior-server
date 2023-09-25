@@ -37,8 +37,9 @@ def handle_likes():
 def show_likes_user(id):
     if request.method == "GET":
         try:
-            like = Likes.query.filter_by(user_id=id).first()
-            return jsonify({"data": like.json}), 200
+            likes = Likes.query.filter_by(user_id=id).all()
+            data = [l.json for l in likes]
+            return jsonify({"data": data}), 200
         except:
             raise exceptions.NotFound("Likes not found for this user")
         
@@ -53,8 +54,9 @@ def show_likes_user(id):
 def show_likes_room(id):
     if request.method == "GET":
         try:
-            like = Likes.query.filter_by(room_id=id).first()
-            return jsonify({"data": like.json}), 200
+            likes = Likes.query.filter_by(room_id=id).all()
+            data = [l.json for l in likes]
+            return jsonify({"data": data}), 200
         except:
             raise exceptions.NotFound("Likes not found for this room")
         
