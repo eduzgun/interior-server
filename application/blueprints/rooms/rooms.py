@@ -1,48 +1,39 @@
-
 from flask import Blueprint, render_template, redirect
 from flask import jsonify, request
 from werkzeug import exceptions
 from application import app, db
-from application.blueprints.users.model import Users
+from application.blueprints.rooms.model import Rooms
+
+# room_name = db.Column(db.String(100), nullable=False)
+#     room_dimensions = db.Column(db.Integer, nullable=False)
+#     room_description = db.Column(db.String(100), nullable=False)
+#     room_theme = db.Column(db.String(100), nullable=False)
+#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+rooms_bp = Blueprint("rooms", __name__)
 
 
-
-users_bp = Blueprint("users", __name__)
-
-
-@users_bp.route("/")
-def hello_interiordesign():
-    return jsonify({
-        "message": "Welcome",
-        "description": "Interior Design API",
-        "endpoint": [
-            "GET /"
-        ]
-    }), 200
-
-
-
-@users_bp.route("/users", methods=["GET"])
-def handle_users():
+@rooms_bp.route("/rooms", methods=['GET', 'POST'])
+def handle_rooms():
     if request.method == "GET":
         try:
-            users = Users.query.all()
-            data = [u.json for u in users]
-            return jsonify({"users": data})
+            rooms = Rooms.query.all()
+            data = [r.json for r in rooms]
+            return jsonify({"rooms": data})
         except:
             raise exceptions.InternalServerError("We are working on it ")
 
-# 
-#     if request.method == "POST":
-#         try:
-#             name, start_date, end_date, country, network = request.json.values()
-#             new_series = Series(name=name, start_date=start_date, end_date=end_date, country=country, network=network) 
 
-#             db.session.add(new_series)
-#             db.session.commit()
-#             return jsonify({"data": new_series.json}), 201
-#         except:
-#             raise exceptions.BadRequest(f"We cannot process your request, name, start_date, end_date, country, network are required")
+    if request.method == "POST":
+        try:
+            name, dimensions, description, theme, user_id = request.json.values()
+            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, user_id=user_id) 
+
+            db.session.add(new_room)
+            db.session.commit()
+            return jsonify({"data": new_room.json}), 201
+        except:
+            raise exceptions.BadRequest(f"We cannot process your request: name, dimensions, description, theme, user_id are required")
 
 
 
@@ -75,9 +66,9 @@ def handle_users():
 
 
 
-# @app.errorhandler(exceptions.BadRequest)
-# def handle_400(err):
-#     return jsonify({"error": f"Ooops {err}"}),400
+@rooms_bp.errorhandler(exceptions.BadRequest)
+def handle_400(err):
+    return jsonify({"error": f"Ooops {err}"}),400
 
 
 # @app.errorhandler(exceptions.NotFound)
@@ -85,7 +76,7 @@ def handle_users():
 #     return jsonify({"error": f"Error message: {err}"})
 
 
-@users_bp.errorhandler(exceptions.InternalServerError)
+@rooms_bp.errorhandler(exceptions.InternalServerError)
 def handle_500(err):
     return jsonify({"error": f"Opps {err}"}),500
 
