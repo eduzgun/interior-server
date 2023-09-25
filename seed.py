@@ -22,8 +22,9 @@ entry6 = Users(username = "user6", password="sakdsa382aweqw")
 entry7 = Rooms(name="My personal room", dimensions="12 ft x 18 ft", description="My new room for my new house", theme="Art Deco" , user_id=1)
 entry8 = Rooms(name="My living room", dimensions="12 ft x 18 ft", description="My new living room for my new house", theme="Bohemian" , user_id=2)
 entry9 = Rooms(name="My bathroom", dimensions="12 ft x 18 ft", description="My new bathroom for my new house", theme="12 ft x 18 ft" , user_id=3)
-entry10 = Likes(user_id=1, room_id=2)
+entry10 = Likes(user_id=1, room_id=1)
 
-db.session.add_all([entry1,entry2,entry3,entry4,entry5,entry6,entry7, entry8,entry9, entry10])
+
+db.session.add_all([entry1,entry2,entry3,entry4,entry5,entry6,entry7, entry8,entry9,entry10])
 
 db.session.commit()

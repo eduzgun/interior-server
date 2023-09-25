@@ -1,5 +1,5 @@
 from application import app, db
-
+from application.blueprints.likes.model import Likes
 
 app.app_context().push()
 
@@ -11,7 +11,9 @@ class Rooms(db.Model):
     description = db.Column(db.String(100), nullable=False)
     theme = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    likes = db.relationship('Likes', backref='likes')
+    likes = db.relationship('Likes', backref='rooms')
+  
+    
 
     
 
