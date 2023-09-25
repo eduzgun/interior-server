@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, redirect
 from flask import jsonify, request
 from werkzeug import exceptions
 from application import app, db
-from application.blueprints.users.models import Users
+from application.blueprints.users.model import Users
 
 
 

@@ -1,4 +1,5 @@
 from application import app, db
+from application.blueprints.rooms.model import Rooms
 
 app.app_context().push()
 
@@ -7,6 +8,7 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String, nullable=False)
+    rooms = db.relationship('Rooms', backref='users')
     
 
 
