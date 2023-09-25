@@ -1,9 +1,16 @@
+
+from flask import Blueprint, render_template, redirect
 from flask import jsonify, request
 from werkzeug import exceptions
 from application import app, db
-from application.models import Users
+from application.blueprints.users.models import Users
 
-@app.route("/")
+
+
+users_bp = Blueprint("users", __name__)
+
+
+@users_bp.route("/")
 def hello_interiordesign():
     return jsonify({
         "message": "Welcome",
@@ -14,15 +21,18 @@ def hello_interiordesign():
     }), 200
 
 
-# @app.route("/series", methods=["GET", "POST"])
-# def handle_series():
-#     if request.method == "GET":
-#         try:
-#             series = Series.query.all()
-#             data = [s.json for s in series]
-#             return jsonify({"series": data})
-#         except:
-#             raise exceptions.InternalServerError("We are working on it ")
+
+@users_bp.route("/users", methods=["GET"])
+def handle_users():
+    if request.method == "GET":
+        try:
+            users = Users.query.all()
+            data = [u.json for u in users]
+            return jsonify({"users": data})
+        except:
+            raise exceptions.InternalServerError("We are working on it ")
+
+# 
 #     if request.method == "POST":
 #         try:
 #             name, start_date, end_date, country, network = request.json.values()
@@ -64,10 +74,6 @@ def hello_interiordesign():
 
 
 
-# @app.errorhandler(exceptions.InternalServerError)
-# def handle_500(err):
-#     return jsonify({"error": f"Opps {err}"}),500
-
 
 # @app.errorhandler(exceptions.BadRequest)
 # def handle_400(err):
@@ -77,3 +83,9 @@ def hello_interiordesign():
 # @app.errorhandler(exceptions.NotFound)
 # def handle_404(err):
 #     return jsonify({"error": f"Error message: {err}"})
+
+
+@users_bp.errorhandler(exceptions.InternalServerError)
+def handle_500(err):
+    return jsonify({"error": f"Opps {err}"}),500
+
