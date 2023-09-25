@@ -7,7 +7,7 @@ class Rooms(db.Model):
     __tablename__='rooms'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    dimensions = db.Column(db.Integer, nullable=False)
+    dimensions = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(100), nullable=False)
     theme = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -20,4 +20,4 @@ class Rooms(db.Model):
     
     @property
     def json(self):
-        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "user_id": self.user_id}
+        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "theme": self.theme, "user_id": self.user_id}
