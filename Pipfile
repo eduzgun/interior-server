@@ -10,6 +10,12 @@ flask-cors = "*"
 flask-sqlalchemy = "*"
 psycopg2-binary = "*"
 gunicorn = "*"
+flask-bcrypt = "*"
+flask-restplus = "*"
+flask-migrate = "*"
+pyjwt = "*"
+flask-script = "*"
+flask-testing = "*"
 
 [dev-packages]
 
@@ -17,7 +23,8 @@ gunicorn = "*"
 python_version = "3.11"
 
 [scripts]
-dev = "flask run -h 0.0.0.0" # <- for docker
-# dev = "flask run"
+# dev = "flask run -h 0.0.0.0" # <- for docker
+dev = "flask run"
 seed = "python seed.py"
 start = "gunicorn app:app"
+manage = "flask run manage.py"
