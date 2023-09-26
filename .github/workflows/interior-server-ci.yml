@@ -30,13 +30,6 @@ jobs:
         run: |
           pipenv install
 
-      - name: Seed database
-        run: 
-          pipenv run seed
-
-      - name: Build Flask app
-        run: |
-          pipenv run dev
 
   test:
     runs-on: ubuntu-latest
@@ -57,10 +50,6 @@ jobs:
         run: |
             pipenv install
             pipenv install --dev
-
-      - name: Seed database
-        run: 
-            pipenv run seed
 
       - name: Run tests
         run: pipenv run test
