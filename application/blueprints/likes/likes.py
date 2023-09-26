@@ -20,15 +20,19 @@ def handle_likes():
 
 
     if request.method == "POST":
-        try:
-            user_id, room_id = request.json.values()
-            new_like = Likes(user_id=user_id, room_id=room_id) 
+        
+        user_id, room_id = request.json.values()
 
+        if Likes.query.filter_by(user_id=user_id, room_id=room_id).first():
+            raise exceptions.BadRequest("This user already liked this room")
+
+        try:    
+            new_like = Likes(user_id=user_id, room_id=room_id) 
             db.session.add(new_like)
             db.session.commit()
             return jsonify({"data": new_like.json}), 201
         except:
-            raise exceptions.BadRequest(f"We cannot process your request: name, dimensions, description, theme, user_id are required")
+            raise exceptions.InternalServerError("Something went wrong")
 
 
 
@@ -36,23 +40,26 @@ def handle_likes():
 @likes_bp.route("/likes/user/<int:id>", methods=['GET'])
 def show_likes_user(id):
     if request.method == "GET":
-        try:
-            likes = Likes.query.filter_by(user_id=id).all()
-            data = [l.json for l in likes]
-            return jsonify({"data": data}), 200
-        except:
+        likes = Likes.query.filter_by(user_id=id).all()
+        data = [l.json for l in likes]
+
+        if not data:
             raise exceptions.NotFound("Likes not found for this user")
+        
+        return jsonify({"data": data}), 200
+            
 
 
 @likes_bp.route("/likes/room/<int:id>", methods=['GET'])
 def show_likes_room(id):
     if request.method == "GET":
-        try:
-            likes = Likes.query.filter_by(room_id=id).all()
-            data = [l.json for l in likes]
-            return jsonify({"data": data}), 200
-        except:
+        likes = Likes.query.filter_by(room_id=id).all()
+        data = [l.json for l in likes]
+
+        if not data:
             raise exceptions.NotFound("Likes not found for this room")
+
+        return jsonify({"data": data}), 200
 
 
 @likes_bp.route("/likes/<int:user_id>/<int:room_id>", methods=['DELETE'])
@@ -70,15 +77,15 @@ def delete_likes_room(user_id, room_id):
 
 @likes_bp.errorhandler(exceptions.BadRequest)
 def handle_400(err):
-    return jsonify({"error": f"Ooops {err}"}),400
+    return jsonify({"error": f"{err}"}),400
 
 
 @likes_bp.errorhandler(exceptions.NotFound)
 def handle_404(err):
-    return jsonify({"error": f"Error message: {err}"})
+    return jsonify({"error": f"{err}"})
 
 
 @likes_bp.errorhandler(exceptions.InternalServerError)
 def handle_500(err):
-    return jsonify({"error": f"Opps {err}"}),500
+    return jsonify({"error": f"{err}"}),500
 

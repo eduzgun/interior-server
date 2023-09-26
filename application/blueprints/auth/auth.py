@@ -43,9 +43,9 @@ def handle_login():
         
 
         if user.email != email: 
-            raise exceptions.BadRequest(f"Incorrect email")
+            raise exceptions.BadRequest("Incorrect email")
         elif not check_password_hash(user.password, password):
-            raise exceptions.BadRequest(f"Incorrect password")
+            raise exceptions.BadRequest("Incorrect password")
         else:
             session.pop('user_id', None)
             session['user_id'] = user.id
@@ -62,6 +62,21 @@ def before_request():
         g.user = Users.query.filter_by(id=user_id).one()
 
 
+@auth_bp.route("/auth/login-check", methods=['GET'])
+def login_check():
+    user_id = session.get('user_id')
+
+    if user_id is None:
+        raise exceptions.Unauthorized("User is not logged in")
+    else:
+        try:
+            user = Users.query.filter_by(id=user_id).one()
+        except:
+            raise exceptions.NotFound("Something whent wrong. User is not found")
+
+        return jsonify({"data": user.json}), 200
+
+
 @auth_bp.route('/auth/logout')
 def logout():
     session.clear()
@@ -72,7 +87,7 @@ def login_required(func):
     @functools.wraps(func)
     def secure_function(*args, **kwargs):
         if g.user is None:
-            raise exceptions.Unauthorized(f"Error message: user is not logged in")
+            raise exceptions.Unauthorized("User is not logged in")
 
         return func(*args, **kwargs)
 
