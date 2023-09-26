@@ -3,3 +3,4 @@ __pycache__
 .env
 notes.md
 .vscode/
+.pytest_cache
