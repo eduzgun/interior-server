@@ -67,7 +67,9 @@ jobs:
 
     steps:
       - name: Deploy to render
-        uses: johnbeynon/render-deploy-action@v0.0.8
+        uses: bounceapp/render-action@0.6.0
         with: 
+          render-token: ${{secrets.RENDER_API_KEY}}
+          github-token: ${{ secrets.MY_TOKEN }}
           service-id: ${{ secrets.SERVICE_ID}}
-          api-key: ${{secrets.RENDER_API_KEY}}
+          
