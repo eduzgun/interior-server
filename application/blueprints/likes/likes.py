@@ -65,7 +65,7 @@ def delete_likes_room(user_id, room_id):
         
         db.session.delete(like)
         db.session.commit()
-        return f"Like Deleted", 204
+        return '', 204
 
 
 @likes_bp.errorhandler(exceptions.BadRequest)

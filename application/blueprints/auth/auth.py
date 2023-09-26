@@ -49,7 +49,7 @@ def handle_login():
         else:
             session.pop('user_id', None)
             session['user_id'] = user.id
-            return f"User logged in", 204
+            return '', 204
 
 
 @auth_bp.before_app_request
@@ -65,7 +65,7 @@ def before_request():
 @auth_bp.route('/auth/logout')
 def logout():
     session.clear()
-    return f"User logged out", 204
+    return '', 204
 
 
 def login_required(func):
