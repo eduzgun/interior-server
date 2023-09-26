@@ -3,7 +3,7 @@ from flask import Blueprint
 from flask import jsonify, request
 from werkzeug import exceptions
 from application import db
-from application.blueprints.users.models import Users
+from application.blueprints.users.model import Users
 from application.blueprints.auth.auth import login_required
 
 

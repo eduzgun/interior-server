@@ -18,6 +18,7 @@ flask-script = "*"
 flask-testing = "*"
 flask-session = "*"
 colorama = "*"
+pytest = "*"
 
 [dev-packages]
 
@@ -30,3 +31,4 @@ dev = "flask run"
 seed = "python seed.py"
 start = "gunicorn app:app"
 manage = "flask run manage.py"
+test = "pytest"
