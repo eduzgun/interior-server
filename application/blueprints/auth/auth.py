@@ -1,5 +1,5 @@
 import functools
-from flask import Blueprint, flash, jsonify, request, session, g, redirect, url_for
+from flask import Blueprint, flash, jsonify, request, session, g
 from werkzeug import exceptions
 from application import db
 from application.blueprints.users.models import Users
@@ -37,13 +37,13 @@ def handle_login():
         elif user.email != email: 
             return jsonify({"error": "Incorrect email"}), 401
         else:
-            session.clear()
+            session.pop('user_id', None)
             session['user_id'] = user.id
             return ('', 204)
 
 
 @auth_bp.before_app_request
-def load_logged_in_user():
+def before_request():
     user_id = session.get('user_id')
 
     if user_id is None:
@@ -59,11 +59,12 @@ def logout():
 
 
 def login_required(func):
-    def secure_function():
+    @functools.wraps(func)
+    def secure_function(*args, **kwargs):
         if g.user is None:
             return  jsonify({"error": "Error message: user is not logged in"}), 400
 
-        return func()
+        return func(*args, **kwargs)
 
     return secure_function
     
