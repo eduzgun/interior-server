@@ -61,7 +61,7 @@ def show_rooms(id):
         room = Rooms.query.filter_by(id=id).first()
         db.session.delete(room)
         db.session.commit()
-        return f"Room Deleted", 204
+        return '', 204
 
 
 
