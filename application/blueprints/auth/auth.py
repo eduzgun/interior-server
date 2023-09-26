@@ -2,6 +2,7 @@ import functools
 from flask import Blueprint, flash, jsonify, request, session, g
 from werkzeug import exceptions
 from application import db
+from sqlalchemy.exc import IntegrityError
 from application.blueprints.users.model import Users
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -17,8 +18,15 @@ def handle_register():
         try:
             db.session.add(new_user)
             db.session.commit()
-        except:
-            raise exceptions.BadRequest(f"Username {username} or email {email} is already registered.")
+        except IntegrityError as err:
+            db.session.rollback()
+            if 'duplicate key value violates unique constraint \"users_username_key\"' in err.orig.args[0]:
+                raise exceptions.BadRequest(f"Username {username} is already registered")
+            elif 'duplicate key value violates unique constraint \"users_email_key\"' in err.orig.args[0]:
+                raise exceptions.BadRequest(f"Email {email} is already registered")
+            else:
+                raise exceptions.InternalServerError("Something went wrong")
+        
         return jsonify({"data": new_user.json}), 201
     
 
@@ -27,15 +35,17 @@ def handle_register():
 def handle_login():
     if request.method == 'POST':
         username, email, password = request.json.values()
+
         try:
-            user = Users.query.filter_by(username=username).first()
+            user = Users.query.filter_by(username=username).one()
         except:
             raise exceptions.NotFound(f"User {username} is not found.")
+        
 
-        if not check_password_hash(user.password, password):
-            return jsonify({"error": "Incorrect password"}), 401
-        elif user.email != email: 
-            return jsonify({"error": "Incorrect email"}), 401
+        if user.email != email: 
+            raise exceptions.BadRequest(f"Incorrect email")
+        elif not check_password_hash(user.password, password):
+            raise exceptions.BadRequest(f"Incorrect password")
         else:
             session.pop('user_id', None)
             session['user_id'] = user.id
@@ -49,7 +59,7 @@ def before_request():
     if user_id is None:
         g.user = None
     else:
-        g.user = Users.query.filter_by(id=user_id).first()
+        g.user = Users.query.filter_by(id=user_id).one()
 
 
 @auth_bp.route('/auth/logout')
@@ -71,9 +81,18 @@ def login_required(func):
 
 @auth_bp.errorhandler(exceptions.BadRequest)
 def handle_400(err):
-     return jsonify({"error": f"Error message: {err}"}), 400
+     return jsonify({"error": f"{err}"}), 400
+
+@auth_bp.errorhandler(exceptions.Unauthorized)
+def handle_401(err):
+     return jsonify({"error": f"{err}"}), 401
 
 @auth_bp.errorhandler(exceptions.NotFound)
 def handle_404(err):
-    return jsonify({"error": f"Error message: {err}"}), 404
+    return jsonify({"error": f"{err}"}), 404
+
+@auth_bp.errorhandler(exceptions.InternalServerError)
+def handle_500(err):
+     return jsonify({"error": f"{err}"}), 500
+
 

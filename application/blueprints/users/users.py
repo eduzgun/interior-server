@@ -19,13 +19,11 @@ def hello_interiordesign():
         ]
     }), 200
 
-
-
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def handle_users(id):
     try:
-        user = Users.query.filter_by(id=id).first()
+        user = Users.query.filter_by(id=id).one()
     except:
         raise exceptions.NotFound("User not found")
 
@@ -46,32 +44,13 @@ def handle_users(id):
         db.session.commit()
         return f"User Deleted", 204
 
-# 
-#     if request.method == "POST":
-#         try:
-#             name, start_date, end_date, country, network = request.json.values()
-#             new_series = Series(name=name, start_date=start_date, end_date=end_date, country=country, network=network) 
-
-#             db.session.add(new_series)
-#             db.session.commit()
-#             return jsonify({"data": new_series.json}), 201
-#         except:
-#             raise exceptions.BadRequest(f"We cannot process your request, name, start_date, end_date, country, network are required")
-
-
-
-
-# @app.errorhandler(exceptions.BadRequest)
-# def handle_400(err):
-#     return jsonify({"error": f"Ooops {err}"}),400
-
 
 @users_bp.errorhandler(exceptions.NotFound)
 def handle_404(err):
-    return jsonify({"error": f"Error message: {err}"}), 404
+    return jsonify({"error": f"{err}"}), 404
 
 
 @users_bp.errorhandler(exceptions.InternalServerError)
 def handle_500(err):
-     return jsonify({"error": f"Error message: {err}"}), 500
+     return jsonify({"error": f"{err}"}), 500
 
