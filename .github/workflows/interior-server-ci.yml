@@ -1,0 +1,84 @@
+name: Doubleways CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.0
+
+      - name: Install pipenv
+        run: |
+            pip install pipenv
+
+      - name: Install dependencies
+        run: |
+          pipenv install
+
+      - name: Seed database
+        env:
+          SQLALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
+        run: 
+          pipenv run seed
+
+      - name: Build Flask app
+        run: |
+          pipenv run dev
+
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.11.0
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: |
+            pipenv install
+            pipenv install --dev
+
+      - name: Seed database
+        env:
+            SQLALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
+        run: 
+            pipenv run seed
+
+      - name: Run tests
+        run: pipenv run test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: test-results
+
+  deploy:
+    name: Deploy
+    needs: [test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to render
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with: 
+          service-id: ${{ secrets.SERVICE_ID}}
+          api-key: ${{secrets.RENDER_API_KEY}}
