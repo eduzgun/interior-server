@@ -42,7 +42,7 @@ def handle_users(id):
     if request.method == "DELETE":
         db.session.delete(user)
         db.session.commit()
-        return f"User Deleted", 204
+        return '', 204
 
 
 @users_bp.errorhandler(exceptions.NotFound)
