@@ -9,14 +9,15 @@ def test_home_route(test_client):
     response = test_client.get("/")
     assert response.status_code == 200
 
-def test_get_all_users(test_client):
+def test_get_user_by_id(test_client):
     '''
-    GIVEN the GET /users route is defined
-    WHEN the '/users' page is requested (GET)
-    THEN check that the response is valid
+    GIVEN the GET /users{id} route is defined
+    WHEN a user is requested by id
+    THEN check that the response is valid and a username is given
     '''
-    response = test_client.get('/users')
+    response = test_client.get('/users/1')
     assert response.status_code == 200
+    assert "username" in response.json["data"]
     
 
 def test_handle_internal_server_error(test_client):
