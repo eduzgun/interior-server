@@ -16,6 +16,8 @@ flask-migrate = "*"
 pyjwt = "*"
 flask-script = "*"
 flask-testing = "*"
+flask-session = "*"
+colorama = "*"
 pytest = "*"
 
 [dev-packages]
