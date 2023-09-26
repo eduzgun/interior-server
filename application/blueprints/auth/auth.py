@@ -2,7 +2,7 @@ import functools
 from flask import Blueprint, flash, jsonify, request, session, g
 from werkzeug import exceptions
 from application import db
-from application.blueprints.users.models import Users
+from application.blueprints.users.model import Users
 from werkzeug.security import check_password_hash, generate_password_hash
 
 
