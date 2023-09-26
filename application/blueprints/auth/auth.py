@@ -49,7 +49,7 @@ def handle_login():
         else:
             session.pop('user_id', None)
             session['user_id'] = user.id
-            return ('', 204)
+            return f"User logged in", 204
 
 
 @auth_bp.before_app_request
@@ -65,14 +65,14 @@ def before_request():
 @auth_bp.route('/auth/logout')
 def logout():
     session.clear()
-    return ('', 204)
+    return f"User logged out", 204
 
 
 def login_required(func):
     @functools.wraps(func)
     def secure_function(*args, **kwargs):
         if g.user is None:
-            return  jsonify({"error": "Error message: user is not logged in"}), 400
+            raise exceptions.Unauthorized(f"Error message: user is not logged in")
 
         return func(*args, **kwargs)
 

@@ -33,7 +33,7 @@ def handle_likes():
 
 
 
-@likes_bp.route("/likes/user/<int:id>", methods=['GET', 'DELETE'])
+@likes_bp.route("/likes/user/<int:id>", methods=['GET'])
 def show_likes_user(id):
     if request.method == "GET":
         try:
@@ -42,15 +42,9 @@ def show_likes_user(id):
             return jsonify({"data": data}), 200
         except:
             raise exceptions.NotFound("Likes not found for this user")
-        
-    
-    if request.method == "DELETE":
-        like = Likes.query.filter_by(user_id=id).first()
-        db.session.delete(like)
-        db.session.commit()
-        return f"Like Deleted", 204
 
-@likes_bp.route("/likes/room/<int:id>", methods=['GET', 'DELETE'])
+
+@likes_bp.route("/likes/room/<int:id>", methods=['GET'])
 def show_likes_room(id):
     if request.method == "GET":
         try:
@@ -59,15 +53,19 @@ def show_likes_room(id):
             return jsonify({"data": data}), 200
         except:
             raise exceptions.NotFound("Likes not found for this room")
-        
-    
+
+
+@likes_bp.route("/likes/<int:user_id>/<int:room_id>", methods=['DELETE'])
+def delete_likes_room(user_id, room_id):
     if request.method == "DELETE":
-        like = Likes.query.filter_by(room_id=id).first()
+        try:
+            like = Likes.query.filter_by(user_id=user_id, room_id=room_id).one()
+        except:
+            raise exceptions.NotFound("Like for this user and room is not found")
+        
         db.session.delete(like)
         db.session.commit()
         return f"Like Deleted", 204
-
-
 
 
 @likes_bp.errorhandler(exceptions.BadRequest)
