@@ -7,4 +7,4 @@ app.register_blueprint(users_bp)
 app.register_blueprint(rooms_bp)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")
