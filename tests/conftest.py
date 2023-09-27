@@ -28,25 +28,25 @@ def test_client():
 
 
 # Create a database fixture
-@pytest.fixture(scope='module')
-def init_database(test_client):
-    # Create the database and the database table
-    db.create_all()
-    # Insert user data
-    # --------------can't add user for now--------- delete this comment when POST working
-    #default_user = Users(username='orange', email="orange-email", password="123")
-    #db.session.add(default_user)
-    # Commit the changes for the users
-    db.session.commit()
-    # Insert book data
-    room = Rooms(name="Test Room", dimensions="10x10", description="A test room", theme="Test Theme", user_id=1)
-    db.session.add(room)
-    # Commit the changes for the books
-    db.session.commit()
-    yield
-    db.drop_all()
+# @pytest.fixture(scope='module')
+# def init_database(test_client):
+#     # Create the database and the database table
+#     db.create_all()
+#     # Insert user data
+#     # --------------can't add user for now--------- delete this comment when POST working
+#     #default_user = Users(username='orange', email="orange-email", password="123")
+#     #db.session.add(default_user)
+#     # Commit the changes for the users
+#     db.session.commit()
+#     # Insert book data
+#     room = Rooms(name="Test Room", dimensions="10x10", description="A test room", theme="Test Theme", user_id=1)
+#     db.session.add(room)
+#     # Commit the changes for the books
+#     db.session.commit()
+#     yield
+#     db.drop_all()
 
-    yield
+#     yield
 
 @pytest.fixture(scope='function')
 def log_in_default_user(test_client):
