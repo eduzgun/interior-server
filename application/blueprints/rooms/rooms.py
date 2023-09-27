@@ -4,12 +4,6 @@ from werkzeug import exceptions
 from application import app, db
 from application.blueprints.rooms.model import Rooms
 
-# room_name = db.Column(db.String(100), nullable=False)
-#     room_dimensions = db.Column(db.Integer, nullable=False)
-#     room_description = db.Column(db.String(100), nullable=False)
-#     room_theme = db.Column(db.String(100), nullable=False)
-#     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-
 rooms_bp = Blueprint("rooms", __name__)
 
 
@@ -40,16 +34,16 @@ def handle_rooms():
 
 @rooms_bp.route("/rooms/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 def show_rooms(id):
+    try:
+        room = Rooms.query.filter_by(id=id).one()
+    except:
+        raise exceptions.NotFound("Room not found")
+
     if request.method == "GET":
-        try:
-            room = Rooms.query.filter_by(id=id).first()
             return jsonify({"data": room.json}), 200
-        except:
-            raise exceptions.NotFound("Room not found")
         
     if request.method == "PATCH":
         data = request.json
-        room = Rooms.query.filter_by(id=id).first()
 
         for (attribute, value) in data.items():
             if hasattr(room, attribute):
@@ -58,10 +52,9 @@ def show_rooms(id):
         return jsonify({"data": room.json })
     
     if request.method == "DELETE":
-        room = Rooms.query.filter_by(id=id).first()
         db.session.delete(room)
         db.session.commit()
-        return f"Room Deleted", 204
+        return '', 204
 
 
 
