@@ -34,7 +34,8 @@ def handle_register():
 @auth_bp.route("/auth/login", methods=['POST'])
 def handle_login():
     if request.method == 'POST':
-        username, email, password = request.json.values()
+        username, password = request.json.values()
+        # username, email, password = request.json.values()
 
         try:
             user = Users.query.filter_by(username=username).one()
@@ -42,9 +43,10 @@ def handle_login():
             raise exceptions.NotFound(f"User {username} is not found.")
         
 
-        if user.email != email: 
-            raise exceptions.BadRequest("Incorrect email")
-        elif not check_password_hash(user.password, password):
+        # if user.email != email: 
+        #     raise exceptions.BadRequest("Incorrect email")
+        # elif not check_password_hash(user.password, password):
+        if not check_password_hash(user.password, password):
             raise exceptions.BadRequest("Incorrect password")
         else:
             session.pop('user_id', None)
