@@ -19,7 +19,9 @@ def hello_interiordesign():
         ]
     }), 200
 
+
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
+@login_required
 def handle_users(id):
     try:
         user = Users.query.filter_by(id=id).one()
