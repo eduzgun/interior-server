@@ -9,17 +9,6 @@ from application.blueprints.auth.auth import login_required
 
 users_bp = Blueprint("users", __name__)
 
-@users_bp.route("/")
-def hello_interiordesign():
-    return jsonify({
-        "message": "Users root endpoint",
-        "description": "Interior Design API",
-        "endpoint": [
-            "GET /"
-        ]
-    }), 200
-
-
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def handle_users(id):
