@@ -1,7 +1,7 @@
 from flask import Blueprint
 from flask import jsonify, request
 from werkzeug import exceptions
-from application import app, db
+from application import db
 from application.blueprints.users.model import Likes
 
 

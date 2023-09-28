@@ -1,5 +1,3 @@
-
-from datetime import timedelta
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -8,40 +6,37 @@ from dotenv import load_dotenv
 import boto3
 import os
 
+from click import echo
 load_dotenv()
 
-app = Flask(__name__)
-app.json_provider_class.sort_keys = False
-CORS(app)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["SQLALCHEMY_DATABASE_URI"]
-app.config['SECRET_KEY'] = os.urandom(32)
-app.config['SESSION_TYPE'] = 'sqlalchemy'
-app.config['SESSION_PERMANENT'] = True
-app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=100)
-app.config['SESSION_COOKIE_SECURE'] = True
-
-db = SQLAlchemy(app)
-
-app.config['SESSION_SQLALCHEMY'] = db
-Session(app)
+db = SQLAlchemy()
 
 s3 = boto3.client('s3', region_name=os.environ["BUCKET_REGION"], aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_ACCESS_KEY"])
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, instance_relative_config=False)
+    #configure as default from config.py
+    app.config.from_object('config.Config')
+    app.json_provider_class.sort_keys = False
+    CORS(app)
 
-    # Load the default configuration from config.py
-    #app.config.from_object('application.config.Config')
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ["SQLALCHEMY_DATABASE_URI"]
     db.init_app(app)
 
-    # Register blueprints and extensions here
-    from application.blueprints.users.users import users_bp
-    from application.blueprints.rooms.rooms import rooms_bp
+    with app.app_context():
+        # Register blueprints and extensions here
+        from application.blueprints.users.users import users_bp
+        from application.blueprints.rooms.rooms import rooms_bp
+        from application.blueprints.auth.auth import auth_bp
+        from application.blueprints.likes.likes import likes_bp
 
-    app.register_blueprint(users_bp)
-    app.register_blueprint(rooms_bp)
+        app.register_blueprint(users_bp)
+        app.register_blueprint(rooms_bp)
+        app.register_blueprint(auth_bp)
+        app.register_blueprint(likes_bp)
+    
+        
+        db.create_all()
+        return app
 
-    return app
+
