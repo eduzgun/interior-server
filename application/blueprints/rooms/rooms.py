@@ -1,7 +1,8 @@
+#from flask import current_app
 from flask import Blueprint, render_template, redirect
 from flask import jsonify, request
 from werkzeug import exceptions
-from application import app, db
+from application import db
 from application.blueprints.rooms.model import Rooms
 
 rooms_bp = Blueprint("rooms", __name__)
