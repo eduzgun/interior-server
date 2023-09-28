@@ -5,6 +5,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_session import Session
 from dotenv import load_dotenv
+import boto3
 import os
 
 load_dotenv()
@@ -24,6 +25,8 @@ db = SQLAlchemy(app)
 
 app.config['SESSION_SQLALCHEMY'] = db
 Session(app)
+
+s3 = boto3.client('s3', region_name=os.environ["BUCKET_REGION"], aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_ACCESS_KEY"])
 
 def create_app():
     app = Flask(__name__)

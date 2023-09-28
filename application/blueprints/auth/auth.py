@@ -1,5 +1,5 @@
 import functools
-from flask import Blueprint, flash, jsonify, request, session, g
+from flask import Blueprint, jsonify, request, session, g
 from werkzeug import exceptions
 from application import db
 from sqlalchemy.exc import IntegrityError
