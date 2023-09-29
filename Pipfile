@@ -19,6 +19,7 @@ flask-testing = "*"
 flask-session = "*"
 colorama = "*"
 pytest = "*"
+boto3 = "*"
 
 [dev-packages]
 pytest-pikachu = "*"
