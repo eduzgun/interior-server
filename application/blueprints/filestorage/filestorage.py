@@ -20,10 +20,10 @@ def get_static_image_url(image_name):
 
 
 
-@filestorage_bp.route("/filestorage/enviroment-maps", methods=['GET','POST'])
-def handle_enviroment_maps():
+@filestorage_bp.route("/filestorage/environment-maps", methods=['GET','POST'])
+def handle_environment_maps():
     if request.method == "GET":
-        folders = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix='enviroment-maps/', Delimiter='/')
+        folders = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix='environment-maps/', Delimiter='/')
 
         map_tree = {}
         for folder in folders.get('CommonPrefixes'):
@@ -48,18 +48,18 @@ def handle_enviroment_maps():
 
         for file in files:
             try:
-                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'enviroment-maps/{folder}/{file.filename}')
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{folder}/{file.filename}')
             except:
                 raise exceptions.InternalServerError("Something went wrong")
 
         return 'Files uploaded successfully.', 201
     
 
-@filestorage_bp.route("/filestorage/enviroment-maps/<string:map_name>", methods=['GET', 'PATCH', 'DELETE'])
-def handle_enviroment_map(map_name):
+@filestorage_bp.route("/filestorage/environment-maps/<string:map_name>", methods=['GET', 'PATCH', 'DELETE'])
+def handle_environment_map(map_name):
     if request.method == "GET":
         map_tree = {}
-        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'enviroment-maps/{map_name}')
+        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{map_name}')
 
         for image in images.get('Contents'):
             image_key = image['Key']
@@ -74,7 +74,7 @@ def handle_enviroment_map(map_name):
         return jsonify(map_tree), 200
     
     if request.method == "PATCH" or request.method == "DELETE":
-        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'enviroment-maps/{map_name}')
+        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{map_name}')
 
         for image in images.get('Contents'):
             image_key = image['Key']
@@ -93,7 +93,7 @@ def handle_enviroment_map(map_name):
 
             for file in files:
                 try:
-                    s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'enviroment-maps/{map_name}/{file.filename}')
+                    s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{map_name}/{file.filename}')
                 except:
                     raise exceptions.InternalServerError("Something went wrong")
 
