@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect
+from flask import Blueprint
 from flask import jsonify, request
 from werkzeug import exceptions
 from application import db
