@@ -18,6 +18,15 @@ def hello_interiordesign():
         ]
     }), 200
 
+@users_bp.route("/users/<string:name>", methods=["GET"])
+def get_by_name(name):
+    try:
+        user = Users.query.filter_by(username=name).one()
+    except:
+        raise exceptions.NotFound("User not found")
+    if request.method == "GET":
+        return jsonify({"data":user.json}),200
+
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 @login_required
 def handle_users(id):
