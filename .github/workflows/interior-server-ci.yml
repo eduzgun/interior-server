@@ -8,6 +8,11 @@ on:
 
 env:
   SQLALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
+  SECRET_KEY: ${{ secrets.MY_SECRET_KEY }}
+  BUCKET_NAME: ${{ secrets.MY_BUCKET_NAME }}
+  BUCKET_REGION: ${{ secrets.MY_BUCKET_REGION }}
+  ACCESS_KEY: ${{ secrets.MY_ACCESS_KEY }}
+  SECRET_ACCESS_KEY: ${{ secrets.MY_SECRET_ACCESS_KEY }}
 
 jobs:
   build:
