@@ -1,7 +1,9 @@
-from application import app, db
+from flask import current_app
+from application import db
 from application.blueprints.likes.model import Likes
 
-app.app_context().push()
+
+#current_app.app_context().push()
 
 class Rooms(db.Model):
     __tablename__='rooms'

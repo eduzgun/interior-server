@@ -4,3 +4,4 @@ __pycache__
 notes.md
 .vscode/
 .pytest_cache
+Pipfile.lock

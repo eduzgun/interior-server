@@ -1,7 +1,9 @@
-from application import app, db
+from flask import current_app
+from application import db
 
 
-app.app_context().push()
+
+#current_app.app_context().push()
 
 
 

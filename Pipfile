@@ -19,16 +19,18 @@ flask-testing = "*"
 flask-session = "*"
 colorama = "*"
 pytest = "*"
+boto3 = "*"
 
 [dev-packages]
+pytest-pikachu = "*"
 
 [requires]
 python_version = "3.11"
 
 [scripts]
 # dev = "flask run -h 0.0.0.0" # <- for docker
-dev = "flask run"
+dev = "flask run -h 0.0.0.0"
 seed = "python seed.py"
 start = "gunicorn app:app"
 manage = "flask run manage.py"
-test = "pytest"
+test = "pytest --pikachu"
