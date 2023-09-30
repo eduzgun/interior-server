@@ -117,7 +117,7 @@ def cleanup_temp_folder():
             file_path = os.path.join('./tmp/', filename)
             os.remove(file_path)
         os.rmdir('./tmp/')
-        return "Temporary folder and files deleted successfully", 200
+        return "", 204
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
 
