@@ -23,8 +23,6 @@ def handle_rooms():
 
     if request.method == "POST":
         try:
-            # name, dimensions, description, theme, category, user_id = request.json.values()
-            print(request.files)
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
             description = request.form.get("description")
@@ -51,8 +49,7 @@ def handle_rooms():
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
 
-        # return jsonify({"data": new_room.json}), 201
-        return "",204
+        return jsonify({"data": new_room.json}), 201
 
 
 
