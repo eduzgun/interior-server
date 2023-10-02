@@ -8,10 +8,11 @@ from application.blueprints.likes.model import Likes
 class Rooms(db.Model):
     __tablename__='rooms'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
     dimensions = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(100), nullable=False)
     theme = db.Column(db.String(100), nullable=False)
+    category = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     likes = db.relationship('Likes', backref='rooms', cascade='all, delete-orphan')
   
@@ -25,4 +26,4 @@ class Rooms(db.Model):
     
     @property
     def json(self):
-        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "theme": self.theme, "user_id": self.user_id}
+        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "theme": self.theme, "category": self.category, "user_id": self.user_id}
