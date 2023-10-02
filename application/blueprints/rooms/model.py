@@ -22,7 +22,7 @@ class Rooms(db.Model):
 
 
     def __repr__(self):
-        return f"Rooms(id: {self.id}, name: {self.name} )"
+        return f"Rooms(id: {self.id}, name: {self.name}, dimensions: {self.dimensions},description: {self.description}, theme: {self.theme}, category: {self.category}, user_id:{self.user_id} )"
     
     @property
     def json(self):
