@@ -1,7 +1,7 @@
-import functools
+import functools, os
 from flask import Blueprint, jsonify, request, session, g
 from werkzeug import exceptions
-from application import db
+from application import db, s3
 from sqlalchemy.exc import IntegrityError
 from application.blueprints.users.model import Users
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -13,7 +13,8 @@ auth_bp = Blueprint("auth", __name__)
 def handle_register():
     if request.method == 'POST':
         username, email, password = request.json.values()
-        new_user = Users(username=username, email=email, password=generate_password_hash(password)) 
+        image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/default.png'})
+        new_user = Users(username=username, email=email, password=generate_password_hash(password), avatar_image=image_url) 
 
         try:
             db.session.add(new_user)

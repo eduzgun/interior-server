@@ -6,6 +6,7 @@ from flask import jsonify, request
 from werkzeug import exceptions
 from application import db
 from application.blueprints.rooms.model import Rooms
+from application.blueprints.auth.auth import login_required
 
 rooms_bp = Blueprint("rooms", __name__)
 
@@ -64,20 +65,6 @@ def show_rooms(id):
 
     if request.method == "GET":
             return jsonify({"data": room.json}), 200
-        
-    # if request.method == "PATCH":
-    #     data = request.json
-
-    #     for (attribute, value) in data.items():
-    #         if hasattr(room, attribute):
-    #             setattr(room, attribute, value)
-    #     db.session.commit()
-    #     return jsonify({"data": room.json })
-    
-    # if request.method == "DELETE":
-    #     db.session.delete(room)
-    #     db.session.commit()
-    #     return '', 204
     
     if request.method == "PATCH" or request.method == "DELETE":
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
