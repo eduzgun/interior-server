@@ -22,24 +22,38 @@ def handle_rooms():
 
 
     if request.method == "POST":
+        try:
+            # name, dimensions, description, theme, category, user_id = request.json.values()
+            print(request.files)
+            name = request.form.get("name")
+            dimensions = request.form.get("dimensions")
+            description = request.form.get("description")
+            theme = request.form.get("theme")
+            category = request.form.get("category")
+            user_id = request.form.get("user_id")
+
+            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, user_id=user_id) 
+
+            db.session.add(new_room)
+            db.session.commit()
+        except Exception as e:
+                return f"An error occurred: {str(e)}", 400
+
+        # upload room files to s3 storage
+        files = request.files
+        count = 0
+        positions = ["pz","nz","px","nx","py","ny"]
+        for file in files:
+            x = files[file]
             try:
-                name, dimensions, description, theme, category, user_id = request.json.values()
-                new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, user_id=user_id) 
-
-                db.session.add(new_room)
-                db.session.commit()
+                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{name}/{positions[count]}')
+                count += 1
             except Exception as e:
-                    return f"An error occurred: {str(e)}", 400
+                return f"An error occurred: {str(e)}", 500
 
-            # upload room files to s3 storage
-            files = request.files.getlist("file")
-            for file in files:
-                try:
-                    s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{name}/{file.filename}')
-                except Exception as e:
-                    return f"An error occurred: {str(e)}", 500
+        # return jsonify({"data": new_room.json}), 201
+        return "",204
 
-            return jsonify({"data": new_room.json}), 201
 
 
 
