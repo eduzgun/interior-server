@@ -118,28 +118,32 @@ def handle_environment_map(id):
             raise exceptions.NotFound("Room not found")
 
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
+
         for image in images.get('Contents'):
             image_key = image['Key']
 
             try:
-                # Temporary file path to store the image
+                    # Temporary file path to store the image
+
                 file_path = f'./tmp/{image_key.split("/")[2]}'
                 folder_name = './tmp/'
+
                 pathlib.Path(file_path).parent.mkdir(parents=True, exist_ok=True)
-                
                 s3.download_file(os.environ["BUCKET_NAME"], image_key, file_path)
                 
-                zipf = zipfile.ZipFile(f'{folder_name}images.zip','w', compression = zipfile.ZIP_STORED)
-                for root, dirs, files in os.walk(folder_name):
-                    for file in files:
-                        zipf.write(folder_name+file)
-                zipf.close()
-
-                # Return a zip file containing the images
-                return send_file(f'../{folder_name}images.zip', as_attachment=True), 200
-            
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
+                
+        zipf = zipfile.ZipFile(f'{folder_name}images.zip','w', compression = zipfile.ZIP_STORED)
+        for root, dirs, files in os.walk(folder_name):
+            for file in files[1:]:
+                zipf.write(folder_name+file)
+        zipf.close()
+
+        # Return a zip file containing the images
+        return send_file(f'../{folder_name}images.zip', as_attachment=True), 200
+                
+        
 
 
 # Delete the temporary folder and its contents
