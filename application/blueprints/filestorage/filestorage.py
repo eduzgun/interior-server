@@ -18,11 +18,11 @@ def get_static_image_url(image_name):
     
     return jsonify({'image_url': image_url}), 200
 
-@filestorage_bp.route("/filestorage/avatar-images/<int:id>", methods=['POST', 'PATCH', 'DELETE'])
+@filestorage_bp.route("/filestorage/avatar-images/<int:user_id>", methods=['POST', 'PATCH', 'DELETE'])
 @login_required
-def get_avatar_image_url(id):
+def get_avatar_image_url(user_id):
     try:
-        user = Users.query.filter_by(id=id).one()
+        user = Users.query.filter_by(id=user_id).one()
     except:
         raise exceptions.NotFound("User not found")
     
@@ -30,8 +30,8 @@ def get_avatar_image_url(id):
         file_ref = request.files
         file = request.files[file_ref]
         try:
-            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{id}')
-            image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{id}'})
+            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
+            image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{user_id}'})
             setattr(user, user.avatar_image, image_url)
             db.session.commit()
         except Exception as e:
@@ -41,7 +41,7 @@ def get_avatar_image_url(id):
     
     if request.method == "PATCH" or request.method == "DELETE":
         try:
-            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'avatar-images/{id}')
+            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'avatar-images/{user_id}')
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
 
@@ -60,8 +60,8 @@ def get_avatar_image_url(id):
             file_ref = request.files
             file = request.files[file_ref]
             try:
-                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{id}')
-                image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{id}'})
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
+                image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{user_id}'})
                 setattr(user, user.avatar_image, image_url)
                 db.session.commit()
             except Exception as e:
