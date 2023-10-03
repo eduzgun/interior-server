@@ -27,8 +27,7 @@ def get_avatar_image_url(user_id):
         raise exceptions.NotFound("User not found")
     
     if request.method == "POST":
-        file_ref = request.files
-        file = request.files[file_ref]
+        file = request.files['file']
         try:
             s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
             image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{user_id}'})
