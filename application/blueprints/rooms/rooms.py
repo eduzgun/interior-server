@@ -6,6 +6,7 @@ from flask import jsonify, request
 from werkzeug import exceptions
 from application import db
 from application.blueprints.rooms.model import Rooms
+from application.blueprints.auth.auth import login_required
 
 rooms_bp = Blueprint("rooms", __name__)
 
@@ -23,8 +24,6 @@ def handle_rooms():
 
     if request.method == "POST":
         try:
-            # name, dimensions, description, theme, category, user_id = request.json.values()
-            print(request.files)
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
             description = request.form.get("description")
@@ -51,8 +50,7 @@ def handle_rooms():
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
 
-        # return jsonify({"data": new_room.json}), 201
-        return "",204
+        return jsonify({"data": new_room.json}), 201
 
 
 
@@ -67,20 +65,6 @@ def show_rooms(id):
 
     if request.method == "GET":
             return jsonify({"data": room.json}), 200
-        
-    # if request.method == "PATCH":
-    #     data = request.json
-
-    #     for (attribute, value) in data.items():
-    #         if hasattr(room, attribute):
-    #             setattr(room, attribute, value)
-    #     db.session.commit()
-    #     return jsonify({"data": room.json })
-    
-    # if request.method == "DELETE":
-    #     db.session.delete(room)
-    #     db.session.commit()
-    #     return '', 204
     
     if request.method == "PATCH" or request.method == "DELETE":
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
@@ -139,8 +123,7 @@ def handle_environment_map(id):
             image_key = image['Key']
 
             try:
-                    # Temporary file path to store the image
-
+                # Temporary file path to store the image
                 file_path = f'./tmp/{image_key.split("/")[2]}'
                 folder_name = './tmp/'
 
@@ -149,15 +132,17 @@ def handle_environment_map(id):
                 
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
-                
-        zipf = zipfile.ZipFile(f'{folder_name}images.zip','w', compression = zipfile.ZIP_STORED)
-        for root, dirs, files in os.walk(folder_name):
-            for file in files[1:]:
-                zipf.write(folder_name+file)
-        zipf.close()
+        try:        
+            zipf = zipfile.ZipFile(f'{folder_name}images.zip','w', compression = zipfile.ZIP_STORED)
+            for root, dirs, files in os.walk(folder_name):
+                for file in files[1:]:
+                    zipf.write(folder_name+file)
+            zipf.close()
 
-        # Return a zip file containing the images
-        return send_file(f'../{folder_name}images.zip', as_attachment=True), 200
+            # Return a zip file containing the images
+            return send_file(f'../{folder_name}images.zip', as_attachment=True), 200
+        except Exception as e:
+                return f"An error occurred: {str(e)}", 500
                 
         
 
