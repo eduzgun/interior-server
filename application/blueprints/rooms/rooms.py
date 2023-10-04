@@ -23,21 +23,6 @@ def handle_rooms():
 
 
     if request.method == "POST":
-        try:
-            name = request.form.get("name")
-            dimensions = request.form.get("dimensions")
-            description = request.form.get("description")
-            theme = request.form.get("theme")
-            category = request.form.get("category")
-            user_id = request.form.get("user_id")
-
-            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, user_id=user_id) 
-
-            db.session.add(new_room)
-            db.session.commit()
-        except Exception as e:
-                return f"An error occurred: {str(e)}", 400
-
         # upload room files to s3 storage
         files = request.files
         count = 0
@@ -49,6 +34,22 @@ def handle_rooms():
                 count += 1
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
+        
+        try:
+            name = request.form.get("name")
+            dimensions = request.form.get("dimensions")
+            description = request.form.get("description")
+            theme = request.form.get("theme")
+            category = request.form.get("category")
+            cover_image = 'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
+            user_id = request.form.get("user_id")
+
+            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
+
+            db.session.add(new_room)
+            db.session.commit()
+        except Exception as e:
+                return f"An error occurred: {str(e)}", 400
 
         return jsonify({"data": new_room.json}), 201
 
@@ -105,7 +106,7 @@ def show_rooms(id):
                 except Exception as e:
                     return f"An error occurred: {str(e)}", 500
 
-            return jsonify({"data": room.json }), 201
+            return jsonify({"data": room.json }), 200
         
 
 

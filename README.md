@@ -9,10 +9,12 @@
  - pipenv run dev
 
 ## Endpoints for file storage API
- - **```GET```** ```/filestorage/static-files/:image_name``` - return **```200```** status code with image url by passed image name (names are same as in your assets/images folder)
  - **```POST```** ```/filestorage/avatar-images/:user_id``` - return **```201```** status code, upload avatar image for user on s3 and change link for avatar image in user table. Pass user id in params.
- - **```PATCH```** ```/filestorage/avatar-images/:user_id``` - return **```201```** status code, delete previous avatar image on s3 and change for new one, update link for avatar image in user table. Pass user id in params.
+ - **```PATCH```** ```/filestorage/avatar-images/:user_id``` - return **```200```** status code, delete previous avatar image on s3 and change for new one, update link for avatar image in user table. Pass user id in params.
  - **```DELETE```** ```/filestorage/avatar-images/:user_id``` - return **```204```** status code, delete avatar image and change link for avatar image in user table for default one. Pass user id in params.
+  - **```POST```** ```/filestorage/room-images/:room_name``` - return **```201```** status code, upload room image for room on s3 and change link for room image in room table. Pass room name in params.
+ - **```PATCH```** ```/filestorage/room-images/:room_name``` - return **```200```** status code, delete previous room image on s3 and change for new one, update link for room image in room table. Pass room name in params.
+ - **```DELETE```** ```/filestorage/room-images/:room_name``` - return **```204```** status code, delete room image and change link for room image in room table for default one. Pass room name in params.
 
 
 ## Endpoints for authentication API
@@ -32,8 +34,10 @@
 
 ## Endpoints for users API
  - **```GET```** ```/users/name/:name``` - return **```200```** status code with a user data for the specified user name
+- **```PATCH```** ```/users/name/:name``` - return **```200```** status code, update user by user name with passed data and return updated user data
+ - **```DELETE```** ```/users/name/:name``` - return **```204```** status code, delete user by user name
  - **```GET```** ```/users/:id``` - return **```200```** status code with a user data for the specified user id
- - **```PATCH```** ```/users/:id``` - return **```201```** status code, update user by user id with passed data and return updated user data
+ - **```PATCH```** ```/users/:id``` - return **```200```** status code, update user by user id with passed data and return updated user data
  - **```DELETE```** ```/users/:id``` - return **```204```** status code, delete user by user id
 
 
@@ -43,5 +47,5 @@
  - **```GET```** ```/rooms/images/:id``` - return **```200```** status code with zip file with images for environment map by passed room id (and create **tmp** folder with images on server)
  - **```POST```** ```/rooms/images/cleanup``` - return **```204```** status code and delete **tmp** folder on server
  - **```GET```** ```/rooms/:id``` - return **```200```** status code and room data from rooms table selected by passed room id
- - **```PATCH```** ```/rooms/:id``` - return **```201```** status code, update room record in rooms table and images for environment map on s3 cloud by passed room id (note - it deletes **ALL** images and replaces them by new, so be aware)
+ - **```PATCH```** ```/rooms/:id``` - return **```200```** status code, update room record in rooms table and images for environment map on s3 cloud by passed room id (note - it deletes **ALL** images and replaces them by new, so be aware)
  - **```DELETE```** ```/rooms/:id``` - return **```204```** status code and delete room record in rooms table with images for environment map by passed room id

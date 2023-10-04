@@ -13,7 +13,7 @@ auth_bp = Blueprint("auth", __name__)
 def handle_register():
     if request.method == 'POST':
         username, email, password = request.json.values()
-        image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/default.png'})
+        image_url = 'https://interior-cloud-store.s3.amazonaws.com/avatar-images/profile.png'
         new_user = Users(username=username, email=email, password=generate_password_hash(password), avatar_image=image_url) 
 
         try:
