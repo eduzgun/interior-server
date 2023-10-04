@@ -17,6 +17,6 @@ def test_client():
 @pytest.fixture(scope='function')
 def log_in_default_user(test_client):
     #login to access @login_required routes
-    response = test_client.post('/auth/login', json={'username': 'orange', 'password': '123'})
+    response = test_client.post('/auth/login', json={'username': 'onion', 'password': '123'})
     assert response.status_code == 204  
 
