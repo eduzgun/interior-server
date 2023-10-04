@@ -34,7 +34,7 @@ def test_update_user(test_client, log_in_default_user):
         "password": "updated_password"
     }
     response = test_client.patch('/users/1', json=updated_user_data)
-    assert response.status_code == 200
+    assert response.status_code == 201
     # Check if the user's information is updated in the database
     updated_user = Users.query.get(1)
     assert updated_user.email == "updated_email@example.com"
