@@ -14,6 +14,7 @@ class Users(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
+    avatar_image = db.Column(db.String, nullable=False)
     rooms = db.relationship('Rooms', backref='users')
     likes = db.relationship('Likes', backref='users')
    
@@ -26,5 +27,5 @@ class Users(db.Model):
     
     @property
     def json(self):
-        return { "id": self.id, "username": self.username, "email": self.email, "password": self.password}
+        return { "id": self.id, "username": self.username, "email": self.email, "password": self.password, "avatar_image": self.avatar_image}
 

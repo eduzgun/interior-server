@@ -1,10 +1,10 @@
 
 import os
-from flask import Blueprint
-from flask import jsonify, request
+from flask import Blueprint, jsonify, request
 from werkzeug import exceptions
+from application import s3, db
+from application.blueprints.users.model import Users
 from application.blueprints.auth.auth import login_required
-from application import s3
 
 
 filestorage_bp = Blueprint("filestorage", __name__)
@@ -13,92 +13,60 @@ filestorage_bp = Blueprint("filestorage", __name__)
 def get_static_image_url(image_name):
     try:
         image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'images/{image_name}'})
-    except:
-        raise exceptions.InternalServerError("Something went wrong")
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
     
     return jsonify({'image_url': image_url}), 200
 
-
-
-@filestorage_bp.route("/filestorage/environment-maps", methods=['GET','POST'])
-def handle_environment_maps():
-    if request.method == "GET":
-        folders = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix='environment-maps/', Delimiter='/')
-
-        map_tree = {}
-        for folder in folders.get('CommonPrefixes'):
-            folder_key = folder['Prefix']
-            map_tree[folder_key] = []
-
-            images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=folder_key)
-            for image in images.get('Contents'):
-                image_key = image['Key']
-                try:
-                    image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': image_key})
-                except:
-                    raise exceptions.InternalServerError("Something went wrong")
-            
-                map_tree[folder_key].append(image_url)
-
-        return jsonify(map_tree), 200
-
-    if request.method == "POST":
-        folder = request.form['folder']
-        files = request.files.getlist("file")
-
-        for file in files:
-            try:
-                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{folder}/{file.filename}')
-            except:
-                raise exceptions.InternalServerError("Something went wrong")
-
-        return 'Files uploaded successfully.', 201
+@filestorage_bp.route("/filestorage/avatar-images/<int:user_id>", methods=['POST', 'PATCH', 'DELETE'])
+@login_required
+def get_avatar_image_url(user_id):
+    try:
+        user = Users.query.filter_by(id=user_id).one()
+    except:
+        raise exceptions.NotFound("User not found")
     
+    if request.method == "POST":
+        file = request.files['file']
+        try:
+            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
+            image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{user_id}'})
+            setattr(user, user.avatar_image, image_url)
+            db.session.commit()
+        except Exception as e:
+            return f"An error occurred: {str(e)}", 500
 
-@filestorage_bp.route("/filestorage/environment-maps/<string:map_name>", methods=['GET', 'PATCH', 'DELETE'])
-def handle_environment_map(map_name):
-    if request.method == "GET":
-        map_tree = {}
-        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{map_name}')
-
-        for image in images.get('Contents'):
-            image_key = image['Key']
-
-            try:
-                image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': image_key})
-            except:
-                raise exceptions.InternalServerError("Something went wrong")
-            
-            map_tree[image_key.split('/')[2]] = image_url
-
-        return jsonify(map_tree), 200
+        return 'Avatar uploaded successfully', 201
     
     if request.method == "PATCH" or request.method == "DELETE":
-        images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{map_name}')
+        try:
+            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'avatar-images/{user_id}')
+        except Exception as e:
+            return f"An error occurred: {str(e)}", 500
 
-        for image in images.get('Contents'):
-            image_key = image['Key']
-
-            try:
-                image_url = s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=image_key)
-            except:
-                raise exceptions.InternalServerError("Something went wrong")
-            
         if request.method == "DELETE":
-            return '', 204
-        
+            try:
+                image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/default.png'})
+                setattr(user, user.avatar_image, image_url)
+                db.session.commit()
+            except Exception as e:
+                return f"An error occurred: {str(e)}", 500
+            
+            return 'Avatar deleted successfully', 201
+
+
         if request.method == "PATCH":
+            file_ref = request.files
+            file = request.files[file_ref]
+            try:
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
+                image_url = s3.generate_presigned_url('get_object', Params={'Bucket': os.environ["BUCKET_NAME"], 'Key': f'avatar-images/{user_id}'})
+                setattr(user, user.avatar_image, image_url)
+                db.session.commit()
+            except Exception as e:
+                return f"An error occurred: {str(e)}", 500
 
-            files = request.files.getlist("file")
-
-            for file in files:
-                try:
-                    s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{map_name}/{file.filename}')
-                except:
-                    raise exceptions.InternalServerError("Something went wrong")
-
-            return 'Files updated successfully.', 201
-
+        return 'Avatar updated successfully', 201
 
 @filestorage_bp.errorhandler(exceptions.NotFound)
 def handle_404(err):

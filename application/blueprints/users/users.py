@@ -8,17 +8,7 @@ from application.blueprints.auth.auth import login_required
 
 users_bp = Blueprint("users", __name__)
 
-@users_bp.route("/")
-def hello_interiordesign():
-    return jsonify({
-        "message": "Welcome to Interior Design API",
-        "description": "Interior Design API",
-        "endpoint": [
-            "GET /"
-        ]
-    }), 200
-
-@users_bp.route("/users/<string:name>", methods=["GET"])
+@users_bp.route("/users/name/<string:name>", methods=['GET', 'PATCH', 'DELETE'])
 def get_by_name(name):
     try:
         user = Users.query.filter_by(username=name).one()
@@ -26,6 +16,20 @@ def get_by_name(name):
         raise exceptions.NotFound("User not found")
     if request.method == "GET":
         return jsonify({"data":user.json}),200
+    
+    if request.method == "PATCH":
+        data = request.json
+
+        for (attribute, value) in data.items():
+            if hasattr(user, attribute):
+                setattr(user, attribute, value)
+        db.session.commit()
+        return jsonify({"data": user.json }), 201
+    
+    if request.method == "DELETE":
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
 
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 @login_required
@@ -45,7 +49,7 @@ def handle_users(id):
             if hasattr(user, attribute):
                 setattr(user, attribute, value)
         db.session.commit()
-        return jsonify({"data": user.json }), 200
+        return jsonify({"data": user.json }), 201
     
     if request.method == "DELETE":
         db.session.delete(user)

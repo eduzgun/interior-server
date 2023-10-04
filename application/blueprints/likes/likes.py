@@ -14,7 +14,7 @@ def handle_likes():
         try:
             likes = Likes.query.all()
             data = [l.json for l in likes]
-            return jsonify({"likes": data})
+            return jsonify({"likes": data}), 200
         except:
             raise exceptions.InternalServerError("We are working on it ")
 
