@@ -26,7 +26,7 @@ def handle_rooms():
         # upload room files to s3 storage
         files = request.files
         count = 0
-        positions = ["pz","nz","px","nx","py","ny"]
+        positions = ["px","nx","py","ny","pz","nz"]
         for file in files:
             x = files[file]
             try:
