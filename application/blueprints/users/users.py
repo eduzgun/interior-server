@@ -16,6 +16,20 @@ def get_by_name(name):
         raise exceptions.NotFound("User not found")
     if request.method == "GET":
         return jsonify({"data":user.json}),200
+    
+    if request.method == "PATCH":
+        data = request.json
+
+        for (attribute, value) in data.items():
+            if hasattr(user, attribute):
+                setattr(user, attribute, value)
+        db.session.commit()
+        return jsonify({"data": user.json }), 201
+    
+    if request.method == "DELETE":
+        db.session.delete(user)
+        db.session.commit()
+        return '', 204
 
 @users_bp.route("/users/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
 @login_required
