@@ -8,7 +8,7 @@ from application.blueprints.auth.auth import login_required
 
 users_bp = Blueprint("users", __name__)
 
-@users_bp.route("/users/name/<string:name>", methods=["GET"])
+@users_bp.route("/users/name/<string:name>", methods=['GET', 'PATCH', 'DELETE'])
 def get_by_name(name):
     try:
         user = Users.query.filter_by(username=name).one()
