@@ -24,7 +24,7 @@ def get_avatar_image_url(user_id):
         try:
             s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}.{file.filename.split(".")[1]}')
             image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}.{file.filename.split(".")[1]}'
-            setattr(user, user.avatar_image, image_url)
+            setattr(user, 'avatar_image', image_url)
             db.session.commit()
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
@@ -40,7 +40,7 @@ def get_avatar_image_url(user_id):
         if request.method == "DELETE":
             try:
                 image_url = 'https://interior-cloud-store.s3.amazonaws.com/avatar-images/profile.png'
-                setattr(user, user.avatar_image, image_url)
+                setattr(user, 'avatar_image', image_url)
                 db.session.commit()
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
@@ -52,7 +52,7 @@ def get_avatar_image_url(user_id):
             try:
                 s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}.{file.filename.split(".")[1]}')
                 image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}.{file.filename.split(".")[1]}'
-                setattr(user, user.avatar_image, image_url)
+                setattr(user, 'avatar_image', image_url)
                 db.session.commit()
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
@@ -73,7 +73,7 @@ def get_room_image_url(room_name):
         try:
             s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}.{file.filename.split(".")[1]}')
             image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}.{file.filename.split(".")[1]}'
-            setattr(room, room.cover_image, image_url)
+            setattr(room, 'cover_image', image_url)
             db.session.commit()
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
@@ -89,7 +89,7 @@ def get_room_image_url(room_name):
         if request.method == "DELETE":
             try:
                 image_url = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{room_name}/px.png'
-                setattr(room, room.cover_image, image_url)
+                setattr(room, 'cover_image', image_url)
                 db.session.commit()
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
@@ -101,7 +101,7 @@ def get_room_image_url(room_name):
             try:
                 s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}.{file.filename.split(".")[1]}')
                 image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}.{file.filename.split(".")[1]}'
-                setattr(room, room.cover_image, image_url)
+                setattr(room, 'cover_image', image_url)
                 db.session.commit()
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
