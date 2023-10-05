@@ -18,7 +18,7 @@ def create_app():
     #configure as default from config.py
     app.config.from_object('config.Config')
     app.json_provider_class.sort_keys = False
-    CORS(app,resources={r"/*":{"origins":"*"}})
+    CORS(app)
 
     @app.route("/")
     def hello_interiordesign():
