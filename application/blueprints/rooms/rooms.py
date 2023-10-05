@@ -26,13 +26,11 @@ def handle_rooms():
         # upload room files to s3 storage
         files = request.files
         form_name = request.form.get("name")
-        count = 0
         positions = ["px","nx","py","ny","pz","nz"]
-        for file in files:
+        for count, file in enumerate(files):
             x = files[file]
             try:
                 s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
-                count += 1
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
             
