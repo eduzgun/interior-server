@@ -24,7 +24,7 @@ def get_by_name(name):
             if hasattr(user, attribute):
                 setattr(user, attribute, value)
         db.session.commit()
-        return jsonify({"data": user.json }), 201
+        return jsonify({"data": user.json }), 200
     
     if request.method == "DELETE":
         db.session.delete(user)
@@ -49,7 +49,7 @@ def handle_users(id):
             if hasattr(user, attribute):
                 setattr(user, attribute, value)
         db.session.commit()
-        return jsonify({"data": user.json }), 201
+        return jsonify({"data": user.json }), 200
     
     if request.method == "DELETE":
         db.session.delete(user)
