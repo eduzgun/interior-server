@@ -11,7 +11,6 @@ from application.blueprints.auth.auth import login_required
 filestorage_bp = Blueprint("filestorage", __name__)
 
 @filestorage_bp.route("/filestorage/avatar-images/<int:user_id>", methods=['POST', 'PATCH', 'DELETE'])
-@login_required
 def get_avatar_image_url(user_id):
     try:
         user = Users.query.filter_by(id=user_id).one()
@@ -61,7 +60,6 @@ def get_avatar_image_url(user_id):
     
 
 @filestorage_bp.route("/filestorage/room-images/<string:room_name>", methods=['POST', 'PATCH', 'DELETE'])
-@login_required
 def get_room_image_url(room_name):
     try:
         room = Rooms.query.filter_by(name=room_name).one()
