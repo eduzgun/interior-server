@@ -18,11 +18,12 @@ def get_avatar_image_url(user_id):
         raise exceptions.NotFound("User not found")
     
     file = request.files['file']
+    print(file.filename.split('.')[1])
     
     if request.method == "POST":
         try:
-            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
-            image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}'
+            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}.{file.filename.split(".")[1]}')
+            image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}.{file.filename.split(".")[1]}'
             setattr(user, user.avatar_image, image_url)
             db.session.commit()
         except Exception as e:
@@ -32,7 +33,7 @@ def get_avatar_image_url(user_id):
     
     if request.method == "PATCH" or request.method == "DELETE":
         try:
-            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'avatar-images/{user_id}')
+            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'avatar-images/{user_id}.{file.filename.split(".")[1]}')
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
 
@@ -49,8 +50,8 @@ def get_avatar_image_url(user_id):
 
         if request.method == "PATCH":
             try:
-                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}')
-                image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}'
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'avatar-images/{user_id}.{file.filename.split(".")[1]}')
+                image_url = f'https://interior-cloud-store.s3.amazonaws.com/avatar-images/{user_id}.{file.filename.split(".")[1]}'
                 setattr(user, user.avatar_image, image_url)
                 db.session.commit()
             except Exception as e:
@@ -70,8 +71,8 @@ def get_room_image_url(room_name):
     
     if request.method == "POST":
         try:
-            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}')
-            image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}'
+            s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}.{file.filename.split(".")[1]}')
+            image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}.{file.filename.split(".")[1]}'
             setattr(room, room.cover_image, image_url)
             db.session.commit()
         except Exception as e:
@@ -81,7 +82,7 @@ def get_room_image_url(room_name):
     
     if request.method == "PATCH" or request.method == "DELETE":
         try:
-            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'room-images/{room_name}')
+            s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=f'room-images/{room_name}.{file.filename.split(".")[1]}')
         except Exception as e:
             return f"An error occurred: {str(e)}", 500
 
@@ -98,8 +99,8 @@ def get_room_image_url(room_name):
 
         if request.method == "PATCH":
             try:
-                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}')
-                image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}'
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'room-images/{room_name}.{file.filename.split(".")[1]}')
+                image_url = f'https://interior-cloud-store.s3.amazonaws.com/room-images/{room_name}.{file.filename.split(".")[1]}'
                 setattr(room, room.cover_image, image_url)
                 db.session.commit()
             except Exception as e:
