@@ -10,7 +10,6 @@ from application.blueprints.auth.auth import login_required
 
 rooms_bp = Blueprint("rooms", __name__)
 
-
 @rooms_bp.route("/rooms", methods=['GET', 'POST'])
 def handle_rooms():
     if request.method == "GET":
@@ -28,12 +27,12 @@ def handle_rooms():
         form_name = request.form.get("name")
         positions = ["px","nx","py","ny","pz","nz"]
         for count, file in enumerate(files):
+            print(file)
             x = files[file]
             try:
                 s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
-            
         try:
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
@@ -42,7 +41,6 @@ def handle_rooms():
             category = request.form.get("category")
             cover_image = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
             user_id = request.form.get("user_id")
-
             new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
 
             db.session.add(new_room)
@@ -110,6 +108,7 @@ def show_rooms(id):
 
 
 @rooms_bp.route("/rooms/images/<int:id>", methods=['GET'])
+@cross_origin()
 def handle_environment_map(id):
     if request.method == "GET":
         try:
