@@ -25,23 +25,22 @@ def handle_rooms():
     if request.method == "POST":
         # upload room files to s3 storage
         files = request.files
-        count = 0
+        form_name = request.form.get("name")
         positions = ["px","nx","py","ny","pz","nz"]
-        for file in files:
+        for count, file in enumerate(files):
             x = files[file]
             try:
-                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{name}/{positions[count]}')
-                count += 1
+                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}.{file.filename.split(".")[1]}')
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
-        
+            
         try:
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
             description = request.form.get("description")
             theme = request.form.get("theme")
             category = request.form.get("category")
-            cover_image = 'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
+            cover_image = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
             user_id = request.form.get("user_id")
 
             new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
@@ -119,7 +118,6 @@ def handle_environment_map(id):
             raise exceptions.NotFound("Room not found")
 
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
-
         for image in images.get('Contents'):
             image_key = image['Key']
 
