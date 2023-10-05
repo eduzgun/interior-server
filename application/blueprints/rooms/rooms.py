@@ -10,6 +10,7 @@ from application.blueprints.auth.auth import login_required
 
 rooms_bp = Blueprint("rooms", __name__)
 
+
 @rooms_bp.route("/rooms", methods=['GET', 'POST'])
 def handle_rooms():
     if request.method == "GET":
@@ -27,7 +28,6 @@ def handle_rooms():
         form_name = request.form.get("name")
         positions = ["px","nx","py","ny","pz","nz"]
         for count, file in enumerate(files):
-            print(file)
             x = files[file]
             try:
                 s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
@@ -108,7 +108,6 @@ def show_rooms(id):
 
 
 @rooms_bp.route("/rooms/images/<int:id>", methods=['GET'])
-@cross_origin()
 def handle_environment_map(id):
     if request.method == "GET":
         try:
