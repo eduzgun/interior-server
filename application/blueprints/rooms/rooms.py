@@ -30,7 +30,7 @@ def handle_rooms():
         for count, file in enumerate(files):
             x = files[file]
             try:
-                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}.{file.filename.split(".")[1]}')
+                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
             
