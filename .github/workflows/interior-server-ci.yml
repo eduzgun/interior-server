@@ -1,9 +1,10 @@
-name: Interior-CI
+name: Doubleways CI
 
 on:
   push:
     branches:
       - main
+
 
 env:
   SQLALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
