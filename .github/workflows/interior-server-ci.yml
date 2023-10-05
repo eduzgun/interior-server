@@ -1,10 +1,9 @@
-name: Doubleways CI
+name: Interior-CI
 
 on:
   push:
     branches:
       - main
-
 
 env:
   SQLALCHEMY_DATABASE_URI: ${{ secrets.SQLALCHEMY_DATABASE_URI }}
@@ -67,7 +66,6 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
