@@ -13,6 +13,7 @@ class Rooms(db.Model):
     description = db.Column(db.String(100), nullable=False)
     theme = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(100), nullable=False)
+    cover_image = db.Column(db.String(), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     likes = db.relationship('Likes', backref='rooms', cascade='all, delete-orphan')
   
@@ -26,4 +27,4 @@ class Rooms(db.Model):
     
     @property
     def json(self):
-        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "theme": self.theme, "category": self.category, "user_id": self.user_id}
+        return { "id": self.id, "name": self.name, "dimensions": self.dimensions, "description": self.description, "theme": self.theme, "category": self.category, "cover_image":self.cover_image, "user_id": self.user_id}

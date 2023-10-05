@@ -23,32 +23,34 @@ def handle_rooms():
 
 
     if request.method == "POST":
+        # upload room files to s3 storage
+        files = request.files
+        form_name = request.form.get("name")
+        count = 0
+        positions = ["px","nx","py","ny","pz","nz"]
+        for file in files:
+            x = files[file]
+            try:
+                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
+                count += 1
+            except Exception as e:
+                return f"An error occurred: {str(e)}", 500
+            
         try:
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
             description = request.form.get("description")
             theme = request.form.get("theme")
             category = request.form.get("category")
+            cover_image = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
             user_id = request.form.get("user_id")
 
-            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, user_id=user_id) 
+            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
 
             db.session.add(new_room)
             db.session.commit()
         except Exception as e:
                 return f"An error occurred: {str(e)}", 400
-
-        # upload room files to s3 storage
-        files = request.files
-        count = 0
-        positions = ["pz","nz","px","nx","py","ny"]
-        for file in files:
-            x = files[file]
-            try:
-                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{name}/{positions[count]}')
-                count += 1
-            except Exception as e:
-                return f"An error occurred: {str(e)}", 500
 
         return jsonify({"data": new_room.json}), 201
 
@@ -105,7 +107,7 @@ def show_rooms(id):
                 except Exception as e:
                     return f"An error occurred: {str(e)}", 500
 
-            return jsonify({"data": room.json }), 201
+            return jsonify({"data": room.json }), 200
         
 
 
@@ -118,7 +120,6 @@ def handle_environment_map(id):
             raise exceptions.NotFound("Room not found")
 
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
-
         for image in images.get('Contents'):
             image_key = image['Key']
 
