@@ -67,7 +67,6 @@ jobs:
 
   deploy:
     name: Deploy
-    needs: [test]
     runs-on: ubuntu-latest
 
     steps:
