@@ -7,11 +7,13 @@ from werkzeug import exceptions
 from application import db
 from application.blueprints.rooms.model import Rooms
 from application.blueprints.auth.auth import login_required
+from flask_cors import cross_origin
 
 rooms_bp = Blueprint("rooms", __name__)
 
 
 @rooms_bp.route("/rooms", methods=['GET', 'POST'])
+@cross_origin()
 def handle_rooms():
     if request.method == "GET":
         try:
@@ -55,6 +57,7 @@ def handle_rooms():
 
 
 @rooms_bp.route("/rooms/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
+@cross_origin()
 def show_rooms(id):
     try:
         room = Rooms.query.filter_by(id=id).one()
@@ -108,6 +111,7 @@ def show_rooms(id):
 
 
 @rooms_bp.route("/rooms/images/<int:id>", methods=['GET'])
+@cross_origin()
 def handle_environment_map(id):
     if request.method == "GET":
         try:
@@ -146,6 +150,7 @@ def handle_environment_map(id):
 
 # Delete the temporary folder and its contents
 @rooms_bp.route('/rooms/images/cleanup', methods=['POST'])
+@cross_origin()
 def cleanup_temp_folder():
     try:
         for filename in os.listdir('./tmp/'):
