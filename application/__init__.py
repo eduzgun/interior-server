@@ -13,7 +13,6 @@ db = SQLAlchemy()
 
 
 s3 = boto3.client('s3', region_name=os.environ["BUCKET_REGION"], aws_access_key_id=os.environ["ACCESS_KEY"], aws_secret_access_key=os.environ["SECRET_ACCESS_KEY"])
-CORS(s3)
 
 def create_app():
     app = Flask(__name__, instance_relative_config=False)
