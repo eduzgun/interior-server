@@ -28,6 +28,7 @@ class Config:
     PERMANENT_SESSION_LIFETIME = timedelta(hours=100)
     SESSION_COOKIE_SECURE = True
     SESSION_SQLALCHEMY = db
+    CORS_HEADERS = "Content-Type"
     
 
 
