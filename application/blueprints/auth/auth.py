@@ -13,7 +13,7 @@ auth_bp = Blueprint("auth", __name__)
 def handle_register():
     if request.method == 'POST':
         username, email, password = request.json.values()
-        image_url = 'https://interior-cloud-store.s3.amazonaws.com/avatar-images/profile.png'
+        image_url = 'https://res.cloudinary.com/de2nposrf/image/upload/v1697042277/static/default_pfp.png'
         new_user = Users(username=username, email=email, password=generate_password_hash(password), avatar_image=image_url) 
         try:
             db.session.add(new_user)

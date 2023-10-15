@@ -7,9 +7,17 @@ from werkzeug import exceptions
 from application import db
 from application.blueprints.rooms.model import Rooms
 from application.blueprints.auth.auth import login_required
+import requests
+import cloudinary
+from cloudinary import api
 
 rooms_bp = Blueprint("rooms", __name__)
 
+cloudinary.config(
+    cloud_name="de2nposrf",
+    api_key="612397944851626",
+    api_secret="KfbF-3DLY1VEOUaS-vr5cY1ZU5U"
+)
 
 @rooms_bp.route("/rooms", methods=['GET', 'POST'])
 def handle_rooms():
@@ -24,24 +32,26 @@ def handle_rooms():
 
     if request.method == "POST":
         # upload room files to s3 storage
-        files = request.files
-        form_name = request.form.get("name")
-        positions = ["px","nx","py","ny","pz","nz"]
-        for count, file in enumerate(files):
-            x = files[file]
-            try:
-                s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
-            except Exception as e:
-                return f"An error occurred: {str(e)}", 500
+        # files = request.files
+        # form_name = request.form.get("name")
+        # positions = ["px","nx","py","ny","pz","nz"]
+        # for count, file in enumerate(files):
+        #     x = files[file]
+        #     try:
+        #         s3.upload_fileobj(x, os.environ["BUCKET_NAME"], f'environment-maps/{form_name}/{positions[count]}')
+        #     except Exception as e:
+        #         return f"An error occurred: {str(e)}", 500
         try:
             name = request.form.get("name")
             dimensions = request.form.get("dimensions")
             description = request.form.get("description")
             theme = request.form.get("theme")
             category = request.form.get("category")
-            cover_image = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
+            # cover_image = f'https://interior-cloud-store.s3.amazonaws.com/environment-maps/{name}/px.png'
             user_id = request.form.get("user_id")
-            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
+            fetchUID = request.form.get("fetchUID")
+            new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, user_id=user_id, fetchUID=fetchUID) 
+            # new_room = Rooms(name=name, dimensions=dimensions, description=description, theme=theme, category=category, cover_image=cover_image, user_id=user_id) 
 
             db.session.add(new_room)
             db.session.commit()
@@ -49,9 +59,6 @@ def handle_rooms():
                 return f"An error occurred: {str(e)}", 400
 
         return jsonify({"data": new_room.json}), 201
-
-
-
 
 
 @rooms_bp.route("/rooms/<int:id>", methods=['GET', 'PATCH', 'DELETE'])
@@ -64,7 +71,7 @@ def show_rooms(id):
     if request.method == "GET":
             return jsonify({"data": room.json}), 200
     
-    if request.method == "PATCH" or request.method == "DELETE":
+    if request.method == "PATCH":
         images = s3.list_objects_v2(Bucket=os.environ["BUCKET_NAME"], Prefix=f'environment-maps/{room.name}')
 
         for image in images.get('Contents'):
@@ -73,38 +80,53 @@ def show_rooms(id):
             try:
                 s3.delete_object(Bucket=os.environ["BUCKET_NAME"], Key=image_key)
             except Exception as e:
+                return f"An error occurred: {str(e)}", 500            
+
+    if request.method == "DELETE":
+        try:
+            db.session.delete(room)
+            db.session.commit()
+        except Exception as e:
+            return f"An error occurred: {str(e)}", 500
+        
+        return '', 204
+    
+    if request.method == "PATCH":
+        data = request.json
+
+        try:
+            for (attribute, value) in data.items():
+                if hasattr(room, attribute):
+                    setattr(room, attribute, value)
+            db.session.commit()
+        except Exception as e:
                 return f"An error occurred: {str(e)}", 500
-            
-        if request.method == "DELETE":
+
+        files = request.files.getlist("file")
+
+        for file in files:
             try:
-                db.session.delete(room)
-                db.session.commit()
+                s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{room.name}/{file.filename}')
             except Exception as e:
                 return f"An error occurred: {str(e)}", 500
-            
-            return '', 204
-        
-        if request.method == "PATCH":
-            data = request.json
 
-            try:
-                for (attribute, value) in data.items():
-                    if hasattr(room, attribute):
-                        setattr(room, attribute, value)
-                db.session.commit()
-            except Exception as e:
-                    return f"An error occurred: {str(e)}", 500
+        return jsonify({"data": room.json }), 200
 
-            files = request.files.getlist("file")
 
-            for file in files:
-                try:
-                    s3.upload_fileobj(file, os.environ["BUCKET_NAME"], f'environment-maps/{room.name}/{file.filename}')
-                except Exception as e:
-                    return f"An error occurred: {str(e)}", 500
+@rooms_bp.route("/rooms/delete-folder",methods=["POST"])
+def delete_folder():
+    folder_path = request.json.get("folderPath")
+    try:
+        resources = api.resources(type="upload", prefix=folder_path, max_results=100)
+        for r in resources["resources"]:
+            api.delete_resources([r["public_id"]])
 
-            return jsonify({"data": room.json }), 200
-        
+        return jsonify({"message":"Folder deleted successfully."})
+    
+    except Exception as e:
+        return jsonify({"success":False, "error":str(e)})
+
+
 
 
 @rooms_bp.route("/rooms/images/<int:id>", methods=['GET'])

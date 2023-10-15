@@ -20,6 +20,8 @@ flask-session = "*"
 colorama = "*"
 pytest = "*"
 boto3 = "*"
+requests = "*"
+cloudinary = "*"
 
 [dev-packages]
 pytest-pikachu = "*"
